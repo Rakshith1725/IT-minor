@@ -1,121 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react'
+import Home from './pages/Home'
+import Dashboard from './pages/Dashboard'
+import Share from './pages/Share'
+import Navbar from './components/shared/Navbar'
+import { AnimatePresence, motion } from 'framer-motion'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// Simple client-side router (no react-router dependency)
+function useRoute() {
+  const [path, setPath] = useState(window.location.pathname)
+  useEffect(() => {
+    const handler = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', handler)
+    return () => window.removeEventListener('popstate', handler)
+  }, [])
+  const navigate = (to) => { window.history.pushState({}, '', to); setPath(to) }
+  return { path, navigate }
 }
 
-export default App
+export default function App() {
+  const { path, navigate } = useRoute()
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('qx_user')) } catch { return null }
+  })
+
+  const login = (userData, token) => {
+    localStorage.setItem('qx_user', JSON.stringify(userData))
+    localStorage.setItem('qx_token', token)
+    setUser(userData)
+  }
+  const logout = () => {
+    localStorage.removeItem('qx_user')
+    localStorage.removeItem('qx_token')
+    setUser(null)
+    navigate('/')
+  }
+
+  const shareToken = path.startsWith('/share/') ? path.split('/share/')[1] : null
+
+  return (
+    <div className="noise-overlay min-h-screen bg-ink-900 text-ink-100">
+      {/* Ambient background grid */}
+      <div
+        className="fixed inset-0 bg-grid-ink bg-grid pointer-events-none"
+        style={{ maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%)' }}
+      />
+
+      {/* Top ambient glow */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, rgba(200,241,53,0.06) 0%, transparent 70%)' }} />
+
+      {!shareToken && (
+        <Navbar user={user} navigate={navigate} path={path} onLogout={logout} onLogin={login} />
+      )}
+
+      <AnimatePresence mode="wait">
+        {shareToken ? (
+          <Share key="share" token={shareToken} />
+        ) : path === '/dashboard' ? (
+          <motion.div key="dashboard"
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}>
+            <Dashboard user={user} navigate={navigate} />
+          </motion.div>
+        ) : (
+          <motion.div key="home"
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}>
+            <Home user={user} navigate={navigate} onLogin={login} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
