@@ -51,13 +51,14 @@ export default function Dashboard({ user, navigate }) {
 
     useEffect(() => {
         const token = localStorage.getItem('qx_token')
-        fetch(`${API}/history?limit=50`, {
+        const userId = user?.id || ''
+        fetch(`${API}/history?limit=50${userId ? `&userId=${userId}` : ''}`, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
             .then(r => r.json())
             .then(d => { setHistory(d.queries || []); setLoading(false) })
             .catch(() => setLoading(false))
-    }, [])
+    }, [user])
 
     const filtered = history.filter(q =>
         q.raw_query?.toLowerCase().includes(search.toLowerCase())

@@ -94,9 +94,9 @@ export default function DiffViewer({
                 {tabs.map(tab => (
                     <button key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-200 ${activeTab === tab.id
-                            ? 'bg-ink-800 text-ink-100 border border-ink-700'
-                            : 'text-ink-500 hover:text-ink-300'
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all duration-200 border ${activeTab === tab.id
+                            ? 'bg-ink-800 text-ink-50 border-ink-600'
+                            : 'text-ink-400 border-ink-800/80 bg-ink-900/40 hover:text-ink-100 hover:border-ink-700'
                             }`}>
                         {tab.label}
                         {tab.count !== null && tab.count > 0 && (
@@ -141,7 +141,7 @@ export default function DiffViewer({
             {activeTab === 'ai' && !aiSQL && (
                 <div className="flex-1 flex flex-col items-center justify-center gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                        <svg className="w-7 h-7 text-violet" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-7 h-7 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.35A3.007 3.007 0 0018 14.5H6a3 3 0 00-2.09.85l-.347-.35z" />
                         </svg>
                     </div>
@@ -152,10 +152,10 @@ export default function DiffViewer({
                         </p>
                     </div>
                     <button onClick={onRequestAI} disabled={aiLoading}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-display font-600 text-ink-900 bg-violet hover:bg-violet-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.97]">
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-display font-600 text-white bg-violet-500 hover:bg-violet-400 border border-violet-400/50 shadow-lg shadow-violet-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.97]">
                         {aiLoading ? (
                             <>
-                                <span className="w-4 h-4 border border-violet-200/30 border-t-violet-200 rounded-full animate-spin" />
+                                <span className="w-4 h-4 border border-white/30 border-t-white rounded-full animate-spin" />
                                 Asking Claude...
                             </>
                         ) : (

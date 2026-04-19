@@ -57,7 +57,7 @@ export default function ResultsPanel({
     }
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full min-h-0 flex flex-col">
 
             {/* Metrics bar */}
             <div className="flex items-center gap-4 px-4 py-3 border-b border-ink-800/60">
@@ -90,6 +90,16 @@ export default function ResultsPanel({
                     </>
                 )}
 
+                {result.isSimulated && (
+                    <>
+                        <div className="w-px h-4 bg-ink-800" />
+                        <div className="flex items-center gap-1.5 text-violet-400">
+                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                            <span className="text-xs font-mono">simulated plan</span>
+                        </div>
+                    </>
+                )}
+
                 {result.indexSuggestions?.some(s => s.severity === 'HIGH') && (
                     <>
                         <div className="w-px h-4 bg-ink-800" />
@@ -104,9 +114,11 @@ export default function ResultsPanel({
             {/* Tab bar */}
             <div className="relative flex items-center gap-1 px-4 pt-3 pb-0 border-b border-ink-800/60" ref={tabsRef}>
                 {TABS.map(t => (
-                    <button key={t.id} data-tab={t.id}
+                    <button key={t.id} data-tab={t.id} type="button"
                         onClick={() => setTab(t.id)}
-                        className={`flex items-center gap-1.5 px-3 pb-2.5 text-xs font-mono transition-all duration-200 relative ${tab === t.id ? 'text-ink-100' : 'text-ink-500 hover:text-ink-300'
+                        className={`flex items-center gap-1.5 px-3 py-1.5 mb-0.5 rounded-t-lg text-xs font-mono transition-all duration-200 relative border border-b-0 ${tab === t.id
+                            ? 'text-ink-50 bg-ink-800/80 border-ink-700/80'
+                            : 'text-ink-400 hover:text-ink-100 border-transparent hover:bg-ink-900/60 hover:border-ink-800/60'
                             }`}>
                         <span className="text-sm">{t.icon}</span>
                         {t.label}
@@ -124,20 +136,25 @@ export default function ResultsPanel({
                     style={{ left: indicator.left, width: indicator.width }} />
             </div>
 
-            {/* Tab content */}
-            <div className="flex-1 overflow-hidden">
+            {/* Tab content — min-h-0 so nested flex children (tree, lists) receive a real height */}
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                 {tab === 'plan' && (
                     <PlanTree
                         planNodes={result.planNodes}
                         rawPlanJson={null}
+                        planError={result.planError}
+                        isSimulated={result.isSimulated}
                     />
                 )}
 
                 {tab === 'indexes' && (
-                    <IndexSuggestions suggestions={result.indexSuggestions || []} />
+                    <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+                        <IndexSuggestions suggestions={result.indexSuggestions || []} />
+                    </div>
                 )}
 
                 {tab === 'rewrite' && (
+                    <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
                     <DiffViewer
                         original={result.rawQuery || ''}
                         classicalSQL={result.classicalOptimizedSQL}
@@ -149,6 +166,7 @@ export default function ResultsPanel({
                         onRequestAI={onRequestAI}
                         regression={aiResult?.regression}
                     />
+                    </div>
                 )}
             </div>
         </div>

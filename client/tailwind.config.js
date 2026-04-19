@@ -8,17 +8,23 @@ export default {
     extend: {
       colors: {
         acid: {
+          DEFAULT: '#C8F135',
+          300: '#E3F98A',
           400: '#C8F135',
-          500: '#C8F135', // Match variable
+          500: '#B3DC2E',
         },
         ember: {
+          DEFAULT: '#FF5C35',
           500: '#FF5C35',
         },
         frost: {
+          DEFAULT: '#38BDF8',
           500: '#38BDF8',
         },
         violet: {
-          500: '#8B5CF6',
+          DEFAULT: '#8B5CF6',
+          400: '#A78BFA',
+          500: '#7C3AED',
         },
         ink: {
           50: '#F2F4F7',

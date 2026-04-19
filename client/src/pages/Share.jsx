@@ -104,8 +104,13 @@ export default function Share({ token }) {
 
                 {tab === 'plan' && (
                     <div className="rounded-2xl overflow-hidden"
-                        style={{ background: '#111418', border: '1px solid rgba(200,241,53,0.08)', height: 500 }}>
-                        <PlanTree planNodes={planNodes} />
+                        style={{ background: '#111418', border: '1px solid rgba(200,241,53,0.08)', height: 600 }}>
+                        <PlanTree 
+                            planNodes={planNodes} 
+                            rawPlanJson={null}
+                            planError={report.plan_error}
+                            isSimulated={!report.execution_plan && planNodes?.length > 0} 
+                        />
                     </div>
                 )}
 

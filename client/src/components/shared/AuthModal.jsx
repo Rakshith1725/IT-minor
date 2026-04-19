@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 
 const API = 'http://localhost:3001/api'
 
@@ -34,51 +35,62 @@ export default function AuthModal({ mode: initialMode, onClose, onLogin }) {
     }
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto"
+            style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(12px)' }}
             onClick={e => e.target === e.currentTarget && onClose()}>
 
-            <div className="w-full max-w-sm rounded-2xl p-6 animate-fade-up relative overflow-hidden"
-                style={{ background: '#111418', border: '1px solid rgba(200,241,53,0.12)' }}>
-
-                {/* Glow corner */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, rgba(200,241,53,0.08) 0%, transparent 70%)' }} />
-
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-display font-700 text-lg">
-                        {mode === 'login' ? 'Welcome back' : 'Create account'}
-                    </h2>
-                    <button onClick={onClose} className="text-ink-400 hover:text-ink-100 transition-colors text-xl leading-none">×</button>
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="w-full max-w-md rounded-[32px] p-8 relative overflow-hidden shadow-[0_0_100px_rgba(200,241,53,0.1)]"
+                style={{ background: '#0D0F12', border: '1px solid rgba(200,241,53,0.15)' }}
+            >
+                {/* Visual Flair */}
+                <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full pointer-events-none"
+                    style={{ background: 'radial-gradient(circle, rgba(200,241,53,0.1) 0%, transparent 70%)' }} />
+                
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 className="font-display font-900 text-2xl text-white tracking-tight">
+                            {mode === 'login' ? 'Welcome Back' : 'Join QueryX'}
+                        </h2>
+                        <p className="text-ink-500 text-xs font-mono mt-1 uppercase tracking-widest">
+                            {mode === 'login' ? 'Access your intelligence' : 'Start optimizing your SQL'}
+                        </p>
+                    </div>
+                    <button onClick={onClose} className="w-10 h-10 rounded-full flex items-center justify-center text-ink-500 hover:text-white hover:bg-white/5 transition-all text-2xl leading-none">×</button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {mode === 'register' && (
                         <div>
-                            <label className="block text-xs text-ink-400 mb-1 font-mono">username</label>
+                            <label className="block text-[10px] font-bold text-ink-500 mb-2 uppercase tracking-widest font-mono">Username</label>
                             <input
-                                className="w-full bg-ink-800 border border-ink-700 rounded-lg px-3 py-2.5 text-sm text-ink-100 outline-none focus:border-acid/50 transition-colors font-mono"
-                                placeholder="your_handle"
+                                className="w-full bg-ink-900/50 border border-ink-800 rounded-2xl px-4 py-3 text-sm text-ink-100 outline-none focus:border-acid/50 focus:bg-ink-900 transition-all font-mono shadow-inner"
+                                placeholder="e.g. sql_ninja"
                                 value={form.username}
                                 onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
                             />
                         </div>
                     )}
                     <div>
-                        <label className="block text-xs text-ink-400 mb-1 font-mono">email</label>
+                        <label className="block text-[10px] font-bold text-ink-500 mb-2 uppercase tracking-widest font-mono">Email Address</label>
                         <input
                             type="email"
-                            className="w-full bg-ink-800 border border-ink-700 rounded-lg px-3 py-2.5 text-sm text-ink-100 outline-none focus:border-acid/50 transition-colors font-mono"
-                            placeholder="you@example.com"
+                            className="w-full bg-ink-900/50 border border-ink-800 rounded-2xl px-4 py-3 text-sm text-ink-100 outline-none focus:border-acid/50 focus:bg-ink-900 transition-all font-mono shadow-inner"
+                            placeholder="you@company.com"
                             value={form.email}
                             onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                         />
                     </div>
                     <div>
-                        <label className="block text-xs text-ink-400 mb-1 font-mono">password</label>
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-[10px] font-bold text-ink-500 uppercase tracking-widest font-mono">Password</label>
+                            {mode === 'login' && <button className="text-[10px] text-acid/60 hover:text-acid font-mono uppercase tracking-tighter">Forgot?</button>}
+                        </div>
                         <input
                             type="password"
-                            className="w-full bg-ink-800 border border-ink-700 rounded-lg px-3 py-2.5 text-sm text-ink-100 outline-none focus:border-acid/50 transition-colors font-mono"
+                            className="w-full bg-ink-900/50 border border-ink-800 rounded-2xl px-4 py-3 text-sm text-ink-100 outline-none focus:border-acid/50 focus:bg-ink-900 transition-all font-mono shadow-inner"
                             placeholder="••••••••"
                             value={form.password}
                             onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
@@ -88,27 +100,35 @@ export default function AuthModal({ mode: initialMode, onClose, onLogin }) {
                 </div>
 
                 {error && (
-                    <div className="mt-3 px-3 py-2 rounded-lg bg-ember/10 border border-ember/20 text-ember text-xs font-mono">
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="mt-4 px-4 py-3 rounded-xl bg-ember/5 border border-ember/20 text-ember text-xs font-mono leading-relaxed"
+                    >
                         {error}
-                    </div>
+                    </motion.div>
                 )}
 
                 <button
                     onClick={submit}
                     disabled={loading}
-                    className="w-full mt-4 py-2.5 rounded-lg font-display font-600 text-sm text-ink-900 bg-acid hover:bg-acid-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]">
-                    {loading ? '...' : mode === 'login' ? 'Sign in' : 'Create account'}
+                    className="w-full mt-8 py-4 rounded-2xl font-display font-800 text-sm text-ink-950 bg-acid hover:bg-acid-400 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl shadow-acid/20 relative group overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-[-45deg]" />
+                    <span className="relative z-10 uppercase tracking-widest">
+                        {loading ? 'Authenticating...' : mode === 'login' ? 'Access Account' : 'Initialize Profile'}
+                    </span>
                 </button>
 
-                <p className="text-center text-xs text-ink-400 mt-4">
-                    {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+                <p className="text-center text-xs text-ink-600 mt-8 font-mono">
+                    {mode === 'login' ? "New to QueryX? " : 'Already a member? '}
                     <button
-                        className="text-acid hover:underline"
+                        className="text-acid font-bold hover:underline"
                         onClick={() => setMode(m => m === 'login' ? 'register' : 'login')}>
-                        {mode === 'login' ? 'Sign up' : 'Sign in'}
+                        {mode === 'login' ? 'Create Account' : 'Sign In'}
                     </button>
                 </p>
-            </div>
+            </motion.div>
         </div>
     )
 }

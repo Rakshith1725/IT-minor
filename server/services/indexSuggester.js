@@ -12,7 +12,8 @@ function suggestIndexes(ast, sql) {
 
     // ── Rule 1: WHERE 
     if (node.where) {
-      const whereCols = extractWhereColumns(node.where);
+      const whereCols = extractWhereColumns(node.where)
+        .filter(c => typeof c.column === 'string' && c.column && typeof c.table === 'string');
 
       whereCols.forEach(({ table, column }) => {
         const realTable = aliasMap[table] || table;
@@ -20,8 +21,8 @@ function suggestIndexes(ast, sql) {
             return;
 
         suggestions.push({
-          table_name: realTable,
-          column_name: column,
+          table_name: String(realTable),
+          column_name: String(column),
           index_type: 'btree',
           severity: 'HIGH',
           reason: `Column "${column}" used in WHERE — avoids full scan`,
@@ -34,11 +35,11 @@ function suggestIndexes(ast, sql) {
         const firstTableAlias = whereCols[0].table;
         const table = aliasMap[firstTableAlias] || firstTableAlias;
 
-        const cols = whereCols.map(c => c.column);
+        const cols = whereCols.map(c => String(c.column)).filter(Boolean);
 
         if (table && cols.length > 1) {
           suggestions.push({
-            table_name: table,
+            table_name: String(table),
             column_name: cols.join(','),
             index_type: 'btree',
             severity: 'HIGH',
@@ -52,15 +53,16 @@ function suggestIndexes(ast, sql) {
     // ── Rule 2: JOIN 
     if (node.join) {
       node.join.forEach(j => {
-        const joinCols = extractJoinColumns(j.on);
+        const joinCols = extractJoinColumns(j.on)
+          .filter(c => typeof c.col === 'string' && c.col && typeof c.table === 'string');
 
         joinCols.forEach(({ table, col }) => {
           const realTable = aliasMap[table] || table;
           if (!realTable || !col) return;
 
           suggestions.push({
-            table_name: realTable,
-            column_name: col,
+            table_name: String(realTable),
+            column_name: String(col),
             index_type: 'btree',
             severity: 'HIGH',
             reason: `JOIN key "${col}" — improves join performance`,
@@ -94,16 +96,16 @@ function suggestIndexes(ast, sql) {
     }
 
     // ── Rule 4: SELECT *
-    if (node.columns === '*') {
+    if (node.columns === '*' || (Array.isArray(node.columns) && node.columns.some(c => c.expr?.column === '*'))) {
       const tableName = extractFirstTable(node.from);
 
       suggestions.push({
-        table_name: tableName || 'unknown',
+        table_name: String(tableName || 'unknown'),
         column_name: '*',
-        index_type: null,
+        index_type: 'btree',
         severity: 'LOW',
-        reason: 'SELECT * prevents covering indexes and increases I/O',
-        create_statement: '-- Replace SELECT * with explicit columns',
+        reason: 'SELECT * prevents covering indexes and increases I/O overhead',
+        create_statement: '-- Optimization: specify only required columns instead of *',
       });
     }
   }

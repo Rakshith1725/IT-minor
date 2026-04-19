@@ -73,8 +73,8 @@ body {
 /* D3 tree styles */
 .tree-link {
   fill: none;
-  stroke: rgba(200, 241, 53, 0.15);
-  stroke-width: 1.5px;
+  stroke: rgba(200, 241, 53, 0.35);
+  stroke-width: 2px;
   transition: stroke 0.3s ease;
 }
 
@@ -167,6 +167,54 @@ body {
   border-radius: 4px;
 }
 
+/* Custom animations */
+@keyframes pulse-acid {
+  0% { box-shadow: 0 0 0 0 rgba(200, 241, 53, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(200, 241, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(200, 241, 53, 0); }
+}
+
+@keyframes intense-pulse-acid {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(200, 241, 53, 0.7); }
+  50% { transform: scale(1.02); box-shadow: 0 0 20px 5px rgba(200, 241, 53, 0.3); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(200, 241, 53, 0); }
+}
+
+.animate-pulse-acid {
+  animation: pulse-acid 2s infinite;
+}
+
+.animate-intense-pulse {
+  animation: intense-pulse-acid 2s infinite ease-in-out;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-right {
+  animation: slide-right 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 /* Noise overlay */
 .noise-overlay::after {
   content: '';
@@ -175,4 +223,33 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
+}
+
+.font-display { font-family: 'Syne', sans-serif; }
+.font-body { font-family: 'DM Sans', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Visualizer specific */
+.node-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    fill: #E4E6E9;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.node-cost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.tree-link {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1.5;
+    transition: all 0.3s ease;
+}
+
+.tree-node-group:hover .tree-link {
+    stroke-opacity: 0.5;
 }
